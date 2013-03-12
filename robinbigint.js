@@ -7,18 +7,23 @@ var complement = function(n) {
 	
 	var result = "";
 
+	var parsedFirstDigit = false;
 	for(var i =0; i < digits.length; i++) {
-		if (i === 0) {
-			result += 10 - parseInt(digits[i]);
+		var currentDigit = parseInt(digits[i]);
+		if (currentDigit === 0 && !parsedFirstDigit) {
+			result += currentDigit;
+			continue;
+		}
+		if (!parsedFirstDigit) {
+			result += 10 - currentDigit;
+			parsedFirstDigit = true;
 		}
 		else {
-			result += 9 - parseInt(digits[i]);
+			result += 9 - currentDigit;
 		}
 	}
 
-	var rval = new BigInt("");
-	rval.setDigits(result);
-	return rval;
+	return result;
 };
 
 function BigInt(n) {
@@ -33,6 +38,7 @@ function BigInt(n) {
 
 BigInt.prototype.setDigits = function(n) {
 	this.digits = n;
+	return this;
 };
 
 BigInt.prototype.getDigits = function() {
@@ -40,7 +46,20 @@ BigInt.prototype.getDigits = function() {
 };
 
 BigInt.prototype.human = function() {
+	this.reduce();
 	return reverseString(this.digits);
+};
+
+//Remove un-needed zeroes
+BigInt.prototype.reduce = function() {
+	var firstRealDigitPos = 0;
+	for(var i = this.digits.length - 1; i >= 1; i--) {
+		if (this.digits[i] !== "0") {
+			firstRealDigitPos = i;
+			break;
+		}
+	}
+	this.digits = this.digits.substring(0, firstRealDigitPos + 1);
 };
 
 
@@ -128,6 +147,43 @@ BigInt.prototype.subtract = function(n) {
 		nInput = reverseString(n);
 	}
 
+	var newSign = 1;
+	var tmpBigInput = new BigInt("");
+	tmpBigInput.setDigits(nInput);
+	if (tmpBigInput.human() === "0") {
+		return this;
+	}
+
+	if ( this.lessthan(tmpBigInput) ) {
+		newSign = -1; //Subtraction will yield negative number.
+	}
+
+	if (newSign > 0) {
+		numTop = this.getDigits();
+		numBtm = nInput;
+	}
+	else {
+		numTop = nInput;
+		numBtm = this.getDigits();
+	}
+
+	numBtm = complement(numBtm);
 	
+	var digitDiff = numTop.length - numBtm.length;
+	for(var i =0; i < digitDiff; i++) {
+		numBtm += "9"; //Pad with 9's
+	}
+
+
+	var bTop = (new BigInt("")).setDigits(numTop);
+	var bBtm = (new BigInt("")).setDigits(numBtm);
+	var bSum = bTop.add(bBtm);
+
+	//Remove the trailing '1'
+	var bSumDigits = bSum.getDigits();
+	var bSumTrimmed = bSumDigits.substring(0, bSumDigits.length - 1);
+	bSum.setDigits(bSumTrimmed);
+	return bSum;
+
 };
 
