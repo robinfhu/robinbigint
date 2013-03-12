@@ -60,6 +60,7 @@ BigInt.prototype.reduce = function() {
 		}
 	}
 	this.digits = this.digits.substring(0, firstRealDigitPos + 1);
+	return this;
 };
 
 
@@ -185,5 +186,61 @@ BigInt.prototype.subtract = function(n) {
 	bSum.setDigits(bSumTrimmed);
 	return bSum;
 
+};
+
+//Multiplication using recursive Karatsuba Algorithm.
+BigInt.prototype.multiply = function(n) {
+	var nInput, currentDigits;
+	if (n instanceof BigInt) {
+		nInput = n.getDigits();
+	}
+	else {
+		nInput = reverseString(n);
+	}
+	
+	currentDigits = this.getDigits();
+	var maxLength = Math.max(nInput.length,currentDigits.length);
+	if (maxLength <= 2) {
+		var a = parseInt(reverseString(currentDigits));
+		var b = parseInt(reverseString(nInput));
+		if (isNaN(a)) a = 0;
+		if (isNaN(b)) b = 0;
+
+		var product = a * b;
+		return new BigInt(product.toString());
+	}
+
+	var halfLength = Math.floor(maxLength / 2);
+	var mPower = maxLength - halfLength;
+
+	var x1,x0, y1,y0;
+	x0 = (new BigInt("")).setDigits(currentDigits.substring(0, mPower));
+	x1 = (new BigInt("")).setDigits(currentDigits.substring(mPower));
+	y0 = (new BigInt("")).setDigits(nInput.substring(0,mPower));
+	y1 = (new BigInt("")).setDigits(nInput.substring(mPower));
+
+	var z0,z1,z2, xSum, ySum;
+	z2 = x1.multiply(y1);
+	z0 = x0.multiply(y0);
+
+	xSum = x0.add(x1);
+	ySum = y0.add(y1);
+	z1 = xSum.multiply(ySum).subtract(z0).subtract(z2);
+
+	//Pad with zeroes
+	var z1Digits = z1.getDigits();
+	var z2Digits = z2.getDigits();
+	for(var i =0; i < mPower; i++) {
+		z1Digits = "0" + z1Digits;
+	}
+	for(var i=0; i < mPower *2; i++) {
+		z2Digits = "0" + z2Digits;
+	}
+
+	z1.setDigits(z1Digits);
+	z2.setDigits(z2Digits);
+
+	return z2.add(z1).add(z0).reduce();
+	
 };
 

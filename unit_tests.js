@@ -59,4 +59,13 @@ d = b.subtract(new BigInt("450098"));
 ASSERT("Test subtraction 3", d.human(), "0");
 d = b.subtract(new BigInt("350100"));
 ASSERT("Test subtraction 4", d.human(), "99998");
+d = b.subtract(new BigInt("350100")).subtract(new BigInt("8"));
+ASSERT("Test subtraction 5", d.human(), "99990");
 
+b = new BigInt("12345");
+d = b.multiply(new BigInt("6789"));
+ASSERT("Test multiply 1", d.human(), "83810205");
+d = b.multiply(new BigInt("1"));
+ASSERT("Test multiply 2", d.human(), "12345");
+d = b.multiply(new BigInt("0"));
+ASSERT("Test multiply 3", d.human(), "0");
