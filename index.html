@@ -1,10 +1,67 @@
 <html>
 	<head>
-		<title>Test big int</title>
+		<title>BigInt by Robin Hu</title>
 		<script src="robinbigint.js"></script>
 		<script src="unit_tests.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/jquery-1.9.1.min.js"></script>
+
+		<link rel='stylesheet' href='css/bootstrap.min.css'>
+
+		<style>
+			.result_box {
+				border: solid 1px #AAA;
+				font-family: Courier New;
+				height: 200px;
+				overflow-y: scroll;
+				word-wrap: break-word;
+			}
+		</style>
+
+		<script>
+			var calcExponent = function() {
+				var base = new BigInt($("#txt_base").val());
+				var result = base;
+				var exponent = parseInt($("#txt_exponent").val());
+				if ( exponent === 0) {
+					result = new BigInt("1");
+				}
+				for(var i=0; i < exponent - 1; i++) {
+					result = result.multiply(base);
+				}
+				$("#exponent_result").text(result.human());
+			};
+			$(function() {
+				$("#calc_exponent").click(function() {
+					calcExponent();
+				});
+			});
+		</script>
 	</head>
 <body>
-	Blah
+	<div class='container'>
+		<h1>BigInt JavaScript Library</h1>
+		<h4>By Robin Hu</h4>
+
+		Just thought I'd implement a quick BigInt library in JavaScript.
+		There's addition, subtraction and multiplication supported. No division for now, as I am interested in using this to calculate large integers.
+		<p/>
+		You can view the source code here: <a href="https://github.com/robinfhu/robinbigint">https://github.com/robinfhu/robinbigint</a>
+		<p/>
+		<h3>Algorithm's Used</h3>
+		<ul>
+			<li>Addition: simply arithmetic add and carry. Taught in grade school.</li>
+			<li>Subtraction: complement method. <a href="http://en.wikipedia.org/wiki/Method_of_complements">http://en.wikipedia.org/wiki/Method_of_complements</a>.</li>
+			<li>Multiplication: <a href="http://en.wikipedia.org/wiki/Karatsuba_algorithm">http://en.wikipedia.org/wiki/Karatsuba_algorithm</a></li>
+		</ul>
+
+		<h3>Exponent Calculations</h3>
+		Base: <input type='number' value='2' min='2' max='99' style='height:auto;' id='txt_base'>
+		Exponent: <input type='number' value='100' min='1'  max='3000' style='height:auto;' id='txt_exponent'>
+		<button id='calc_exponent' class='btn'>Calculate</button>
+		<div id='exponent_result' class='result_box'>
+			3812983901283901849180
+		</div>
+	</div>
 </body>
 </html>
